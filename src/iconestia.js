@@ -1,0 +1,192 @@
+const SPRITE_ID = 'iconestia-sprite';
+const DEFAULT_VIEWBOX = '0 0 24 24';
+
+let externalSpriteUrl = null;
+const customIcons = new Map();
+
+function safeEscape(value) {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+    return CSS.escape(value);
+  }
+
+  return String(value).replace(/[^a-zA-Z0-9_-]/g, '_');
+}
+
+function ensureSpriteRoot() {
+  if (typeof document === 'undefined') return null;
+
+  let sprite = document.getElementById(SPRITE_ID);
+  if (sprite) return sprite;
+
+  sprite = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  sprite.setAttribute('id', SPRITE_ID);
+  sprite.setAttribute('aria-hidden', 'true');
+  sprite.style.position = 'absolute';
+  sprite.style.width = '0';
+  sprite.style.height = '0';
+  sprite.style.overflow = 'hidden';
+
+  const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
+  sprite.appendChild(defs);
+  document.body.prepend(sprite);
+
+  return sprite;
+}
+
+function spriteDefs() {
+  const sprite = ensureSpriteRoot();
+  if (!sprite) return null;
+  return sprite.querySelector('defs');
+}
+
+function normalizeIconEntry(name, icon) {
+  if (!name || !icon || typeof icon !== 'object' || !icon.body) {
+    return null;
+  }
+
+  return {
+    name,
+    body: icon.body,
+    viewBox: icon.viewBox || DEFAULT_VIEWBOX,
+  };
+}
+
+function upsertSymbol({ name, body, viewBox = DEFAULT_VIEWBOX }) {
+  const defs = spriteDefs();
+  if (!defs || !name || !body) return;
+
+  const id = `icon-${name}`;
+  let symbol = defs.querySelector(`#${safeEscape(id)}`);
+
+  if (!symbol) {
+    symbol = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
+    symbol.setAttribute('id', id);
+    defs.appendChild(symbol);
+  }
+
+  symbol.setAttribute('viewBox', viewBox);
+  symbol.innerHTML = body;
+}
+
+function inferViewBox(name) {
+  return customIcons.get(name)?.viewBox || DEFAULT_VIEWBOX;
+}
+
+export function setExternalSprite(url) {
+  externalSpriteUrl = url;
+}
+
+export function registerIcons(iconSet = {}) {
+  const entries = Array.isArray(iconSet)
+    ? iconSet.map((icon) => [icon.name, icon])
+    : Object.entries(iconSet).map(([name, icon]) => [name, { name, ...icon }]);
+
+  const registered = [];
+
+  for (const [name, icon] of entries) {
+    const normalized = normalizeIconEntry(name, icon);
+    if (!normalized) continue;
+
+    customIcons.set(normalized.name, {
+      body: normalized.body,
+      viewBox: normalized.viewBox,
+    });
+    upsertSymbol(normalized);
+    registered.push(normalized.name);
+  }
+
+  return registered;
+}
+
+export function addIconFromSvg(name, svgString) {
+  if (!name || !svgString) return false;
+
+  const viewBoxMatch = svgString.match(/viewBox\s*=\s*"([^"]+)"/i);
+  const bodyMatch = svgString.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
+  const body = bodyMatch?.[1]?.trim();
+
+  if (!body) return false;
+
+  registerIcons({
+    [name]: {
+      viewBox: viewBoxMatch?.[1] || DEFAULT_VIEWBOX,
+      body,
+    },
+  });
+
+  return true;
+}
+
+export async function loadIconsFromUrl(url) {
+  if (typeof fetch === 'undefined') {
+    throw new Error('fetch is not available in this environment');
+  }
+
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Failed to load icon manifest: ${response.status}`);
+  }
+
+  const manifest = await response.json();
+  return registerIcons(manifest);
+}
+
+function hrefForIcon(name) {
+  if (customIcons.has(name) || !externalSpriteUrl) {
+    return `#icon-${name}`;
+  }
+
+  return `${externalSpriteUrl}#icon-${name}`;
+}
+
+export class IconestiaIcon extends HTMLElement {
+  static get observedAttributes() {
+    return ['name', 'size', 'stroke', 'fill', 'title', 'color', 'viewbox'];
+  }
+
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+  }
+
+  connectedCallback() {
+    this.render();
+  }
+
+  attributeChangedCallback() {
+    this.render();
+  }
+
+  render() {
+    const name = this.getAttribute('name');
+    if (!name) {
+      this.shadowRoot.innerHTML = '';
+      return;
+    }
+
+    const size = this.getAttribute('size') || '1em';
+    const color = this.getAttribute('color') || 'currentColor';
+    const stroke = this.getAttribute('stroke') || color;
+    const fill = this.getAttribute('fill') || 'none';
+    const title = this.getAttribute('title');
+    const viewBox = this.getAttribute('viewbox') || inferViewBox(name);
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        :host { display: inline-flex; line-height: 0; color: ${color}; }
+        svg { width: ${size}; height: ${size}; stroke: ${stroke}; fill: ${fill}; }
+      </style>
+      <svg viewBox="${viewBox}" aria-hidden="${title ? 'false' : 'true'}" role="img">
+        ${title ? `<title>${title}</title>` : ''}
+        <use href="${hrefForIcon(name)}"></use>
+      </svg>
+    `;
+  }
+}
+
+export function defineIconElement(tagName = 'iconestia-icon') {
+  if (typeof customElements === 'undefined') return;
+  if (!customElements.get(tagName)) {
+    customElements.define(tagName, IconestiaIcon);
+  }
+}

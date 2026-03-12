@@ -1,0 +1,31 @@
+{
+  "name": "iconestia",
+  "version": "0.1.0",
+  "description": "Framework-agnostic custom icon library with sprite builder and web component",
+  "type": "module",
+  "main": "src/iconestia.js",
+  "exports": {
+    ".": "./src/iconestia.js",
+    "./builder": "./scripts/build-icons.mjs"
+  },
+  "scripts": {
+    "build": "node scripts/build-icons.mjs",
+    "check": "node --check src/iconestia.js && node --check scripts/build-icons.mjs"
+  },
+  "files": [
+    "src",
+    "scripts",
+    "dist",
+    "icons",
+    "README.md"
+  ],
+  "keywords": [
+    "icons",
+    "web-component",
+    "svg",
+    "react",
+    "angular",
+    "blazor"
+  ],
+  "license": "MIT"
+}
