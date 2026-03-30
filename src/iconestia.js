@@ -39,6 +39,12 @@ function spriteDefs() {
   return sprite.querySelector('defs');
 }
 
+function getSymbolByName(name) {
+  const defs = spriteDefs();
+  if (!defs) return null;
+  return defs.querySelector(`#${safeEscape(`icon-${name}`)}`);
+}
+
 function normalizeIconEntry(name, icon) {
   if (!name || !icon || typeof icon !== 'object' || !icon.body) {
     return null;
@@ -69,11 +75,64 @@ function upsertSymbol({ name, body, viewBox = DEFAULT_VIEWBOX }) {
 }
 
 function inferViewBox(name) {
-  return customIcons.get(name)?.viewBox || DEFAULT_VIEWBOX;
+  const localSymbol = getSymbolByName(name);
+  return localSymbol?.getAttribute('viewBox') || customIcons.get(name)?.viewBox || DEFAULT_VIEWBOX;
 }
 
-export function setExternalSprite(url) {
+function rerenderIconElements() {
+  if (typeof document === 'undefined') return;
+
+  document.querySelectorAll('iconestia-icon').forEach((el) => {
+    if (typeof el.render === 'function') {
+      el.render();
+    }
+  });
+}
+
+function importSpriteSymbols(spriteText) {
+  if (typeof DOMParser === 'undefined') return [];
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(spriteText, 'image/svg+xml');
+  const symbols = [...doc.querySelectorAll('symbol[id]')];
+
+  const imported = [];
+  for (const symbol of symbols) {
+    const id = symbol.getAttribute('id');
+    if (!id || !id.startsWith('icon-')) continue;
+
+    const name = id.slice(5);
+    const viewBox = symbol.getAttribute('viewBox') || DEFAULT_VIEWBOX;
+    const body = symbol.innerHTML.trim();
+    if (!body) continue;
+
+    upsertSymbol({ name, body, viewBox });
+    imported.push(name);
+  }
+
+  return imported;
+}
+
+export async function setExternalSprite(url, options = {}) {
   externalSpriteUrl = url;
+
+  const inline = options.inline ?? true;
+  if (!inline || typeof fetch === 'undefined') return [];
+
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch sprite: ${response.status}`);
+    }
+
+    const spriteText = await response.text();
+    const imported = importSpriteSymbols(spriteText);
+    if (imported.length > 0) rerenderIconElements();
+    return imported;
+  } catch {
+    // Keep external fragment mode as fallback even if inlining fails.
+    return [];
+  }
 }
 
 export function registerIcons(iconSet = {}) {
@@ -95,6 +154,7 @@ export function registerIcons(iconSet = {}) {
     registered.push(normalized.name);
   }
 
+  rerenderIconElements();
   return registered;
 }
 
@@ -132,7 +192,7 @@ export async function loadIconsFromUrl(url) {
 }
 
 function hrefForIcon(name) {
-  if (customIcons.has(name) || !externalSpriteUrl) {
+  if (customIcons.has(name) || getSymbolByName(name) || !externalSpriteUrl) {
     return `#icon-${name}`;
   }
 

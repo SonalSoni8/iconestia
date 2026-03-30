@@ -48,7 +48,8 @@ This generates:
   defineIconElement();
 
   // 1) Shared icon set from CDN/static host
-  setExternalSprite('/dist/sprite.svg');
+  // inlines sprite symbols when possible (more reliable in HTML pages)
+  await setExternalSprite('/dist/sprite.svg');
 
   // 2) Project-specific custom icon (no package rebuild needed)
   registerIcons({
@@ -76,7 +77,7 @@ import {
 export function App() {
   useEffect(() => {
     defineIconElement();
-    setExternalSprite('/icons/sprite.svg');
+    setExternalSprite('/icons/sprite.svg'); // async, can be awaited
 
     // optional: load project-specific icons from JSON
     loadIconsFromUrl('/project-icons/icons.json');
@@ -171,6 +172,13 @@ python3 -m http.server 8080
 
 If all three happen, HTML usage is working correctly.
 
+## HTML troubleshooting (if icons don't show)
+
+- Make sure you are using `http://localhost...` (not opening the HTML file directly with `file://`).
+- Verify the sprite URL is correct in Network tab (`/dist/sprite.svg` should return 200).
+- Prefer `await setExternalSprite('/dist/sprite.svg')` inside `type="module"` scripts.
+- If using a subfolder path, use a relative URL like `./dist/sprite.svg`.
+
 ## Distribution options
 
 - **npm package**: publish this repo as-is.
@@ -186,7 +194,7 @@ If all three happen, HTML usage is working correctly.
 ## API
 
 - `defineIconElement(tagName = 'iconestia-icon')`
-- `setExternalSprite(url)`
+- `setExternalSprite(url, options?) => Promise<string[]>`
 - `registerIcons(iconMap | iconArray) => string[]`
 - `addIconFromSvg(name, svgString) => boolean`
 - `loadIconsFromUrl(url) => Promise<string[]>`

@@ -24,7 +24,7 @@
       import { defineIconElement, setExternalSprite, registerIcons } from '../src/iconestia.js';
 
       defineIconElement();
-      setExternalSprite('../dist/sprite.svg');
+      await setExternalSprite('../dist/sprite.svg');
 
       // Custom project-local icon (no rebuild needed)
       registerIcons({
