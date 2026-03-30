@@ -27,5 +27,14 @@
     "angular",
     "blazor"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SonalSoni8/iconestia.git"
+  },
+  "author": "sonal soni",
+  "bugs": {
+    "url": "https://github.com/SonalSoni8/iconestia/issues"
+  },
+  "homepage": "https://github.com/SonalSoni8/iconestia#readme"
 }
