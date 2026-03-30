@@ -82,6 +82,52 @@ Run `npm run build`, then use:
 <iconestia-icon name="bolt" size="24px"></iconestia-icon>
 ```
 
+## Use in basic HTML5 (no Node, no npm, no bundler)
+
+Yes, you can use Iconestia in pure vanilla HTML.
+
+### Minimum files you need
+
+- `dist/iconestia.global.js` (**required**)
+- `dist/sprite.svg` (optional, only for shared icons hosted as sprite)
+- `dist/icons.json` (optional, only if you want to load a manifest)
+
+### Folder example
+
+```text
+my-site/
+  index.html
+  assets/
+    iconestia.global.js
+    sprite.svg
+```
+
+### Vanilla HTML example (no imports)
+
+```html
+<script src="./assets/iconestia.global.js"></script>
+<script>
+  Iconestia.defineIconElement();
+  Iconestia.setExternalSprite('./assets/sprite.svg');
+</script>
+
+<iconestia-icon name="bolt" size="24px" color="#2563eb"></iconestia-icon>
+```
+
+### CDN style usage
+
+Host these files on any static host/CDN and reference absolute URLs:
+
+```html
+<script src="https://your-cdn.com/iconestia/iconestia.global.js"></script>
+<script>
+  Iconestia.defineIconElement();
+  Iconestia.setExternalSprite('https://your-cdn.com/iconestia/sprite.svg');
+</script>
+```
+
+See `examples/vanilla-no-node.html` for a complete no-node example.
+
 ## React usage
 
 ```jsx

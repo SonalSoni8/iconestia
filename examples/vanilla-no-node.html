@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iconestia Vanilla (No Node)</title>
+    <style>
+      body { font-family: Arial, sans-serif; padding: 20px; }
+      .icons { display: flex; gap: 12px; align-items: center; }
+    </style>
+  </head>
+  <body>
+    <h2>Vanilla HTML5 (No Node, No Bundler)</h2>
+    <p>Uses only downloaded files from <code>dist/</code>.</p>
+
+    <div class="icons">
+      <iconestia-icon name="bolt" size="22px" color="#1d4ed8"></iconestia-icon>
+      <iconestia-icon name="leaf" size="28px" stroke="#16a34a"></iconestia-icon>
+      <iconestia-icon name="myLocal" size="26px" stroke="#dc2626"></iconestia-icon>
+    </div>
+
+    <!-- Only required JS file -->
+    <script src="../dist/iconestia.global.js"></script>
+    <script>
+      Iconestia.defineIconElement();
+
+      // Optional shared sprite file
+      Iconestia.setExternalSprite('../dist/sprite.svg');
+
+      // Project-local runtime icon (no build step required)
+      Iconestia.registerIcons({
+        myLocal: {
+          viewBox: '0 0 24 24',
+          body: '<path d="M4 12h16M12 4v16" />'
+        }
+      });
+    </script>
+  </body>
+</html>
