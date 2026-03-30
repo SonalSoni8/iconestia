@@ -29,15 +29,15 @@ This generates:
 
 - `dist/sprite.svg` (for CDN/static hosting)
 - `dist/icons.json` (manifest for runtime registration)
+- `dist/iconestia.global.js` (browser global build for vanilla HTML)
 
 ## HTML usage
 
 ```html
 <script type="module">
-  import { defineIconElement, setExternalSprite } from './src/iconestia.js';
+  import { setupIconestia } from './src/iconestia.js';
 
-  defineIconElement();
-  setExternalSprite('/dist/sprite.svg');
+  setupIconestia('/dist/sprite.svg');
 </script>
 
 <iconestia-icon name="bolt" size="24px"></iconestia-icon>
@@ -114,6 +114,9 @@ Now use it the same way:
 ## API
 
 - `defineIconElement(tagName = 'iconestia-icon')`
-- `setExternalSprite(url)`
+- `setupIconestia(spriteUrl, options?)`
+- `setExternalSprite(url, options?)`
 - `registerIcons(iconMap | iconArray)`
+- `loadIconsFromUrl(url)`
+- `addIconFromSvg(name, svgString)`
 

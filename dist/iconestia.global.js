@@ -78,7 +78,9 @@ function upsertSymbol({ name, body, viewBox = DEFAULT_VIEWBOX }) {
 
 function inferViewBox(name) {
   const localSymbol = getSymbolByName(name);
-  return localSymbol?.getAttribute('viewBox') || customIcons.get(name)?.viewBox || DEFAULT_VIEWBOX;
+  return (
+    localSymbol?.getAttribute('viewBox') || customIcons.get(name)?.viewBox || DEFAULT_VIEWBOX
+  );
 }
 
 function rerenderIconElements() {
@@ -113,6 +115,41 @@ function importSpriteSymbols(spriteText) {
   }
 
   return imported;
+}
+
+function extractSvgRootAttributes(svgString) {
+  const m = svgString.match(/<svg([^>]*)>/i);
+  if (!m?.[1]) return '';
+
+  const attrs = [];
+  const attrRegex = /([a-zA-Z_:][\w:.-]*)\s*=\s*"([^"]*)"/g;
+  const blocked = new Set(['width', 'height', 'viewBox', 'xmlns', 'xmlns:xlink']);
+  let match = attrRegex.exec(m[1]);
+
+  while (match) {
+    const name = match[1];
+    if (!blocked.has(name)) {
+      attrs.push(`${name}="${match[2]}"`);
+    }
+    match = attrRegex.exec(m[1]);
+  }
+
+  return attrs.join(' ');
+}
+
+function extractIconDataFromSvg(svgString) {
+  const viewBoxMatch = svgString.match(/viewBox\s*=\s*"([^"]+)"/i);
+  const bodyMatch = svgString.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
+  const body = bodyMatch?.[1]?.trim();
+  if (!body) return null;
+
+  const rootAttrs = extractSvgRootAttributes(svgString);
+  const normalizedBody = rootAttrs ? `<g ${rootAttrs}>${body}</g>` : body;
+
+  return {
+    viewBox: viewBoxMatch?.[1] || DEFAULT_VIEWBOX,
+    body: normalizedBody,
+  };
 }
 
 async function setExternalSprite(url, options = {}) {
@@ -163,16 +200,13 @@ function registerIcons(iconSet = {}) {
 function addIconFromSvg(name, svgString) {
   if (!name || !svgString) return false;
 
-  const viewBoxMatch = svgString.match(/viewBox\s*=\s*"([^"]+)"/i);
-  const bodyMatch = svgString.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
-  const body = bodyMatch?.[1]?.trim();
-
-  if (!body) return false;
+  const iconData = extractIconDataFromSvg(svgString);
+  if (!iconData) return false;
 
   registerIcons({
     [name]: {
-      viewBox: viewBoxMatch?.[1] || DEFAULT_VIEWBOX,
-      body,
+      viewBox: iconData.viewBox,
+      body: iconData.body,
     },
   });
 
@@ -199,6 +233,20 @@ function hrefForIcon(name) {
   }
 
   return `${externalSpriteUrl}#icon-${name}`;
+}
+
+function getIconBody(name) {
+  const localSymbol = getSymbolByName(name);
+  if (localSymbol) {
+    return localSymbol.innerHTML;
+  }
+
+  const custom = customIcons.get(name);
+  if (custom) {
+    return custom.body;
+  }
+
+  return '';
 }
 
 class IconestiaIcon extends HTMLElement {
@@ -232,6 +280,11 @@ class IconestiaIcon extends HTMLElement {
     const fill = this.getAttribute('fill') || 'none';
     const title = this.getAttribute('title');
     const viewBox = this.getAttribute('viewbox') || inferViewBox(name);
+    const iconBody = getIconBody(name);
+    const externalHref = hrefForIcon(name);
+    const iconMarkup = iconBody
+      ? iconBody
+      : `<use href="${externalHref}" xlink:href="${externalHref}"></use>`;
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -240,7 +293,7 @@ class IconestiaIcon extends HTMLElement {
       </style>
       <svg viewBox="${viewBox}" aria-hidden="${title ? 'false' : 'true'}" role="img">
         ${title ? `<title>${title}</title>` : ''}
-        <use href="${hrefForIcon(name)}"></use>
+        ${iconMarkup}
       </svg>
     `;
   }
@@ -253,12 +306,23 @@ function defineIconElement(tagName = 'iconestia-icon') {
   }
 }
 
+function setupIconestia(spriteUrl, options = {}) {
+  const tagName = options.tagName || 'iconestia-icon';
+  defineIconElement(tagName);
+
+  if (!spriteUrl) {
+    return Promise.resolve([]);
+  }
+
+  return setExternalSprite(spriteUrl, options.spriteOptions);
+}
 
   global.Iconestia = {
     setExternalSprite,
     registerIcons,
     addIconFromSvg,
     loadIconsFromUrl,
+    setupIconestia,
     IconestiaIcon,
     defineIconElement
   };
