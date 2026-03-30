@@ -34,8 +34,13 @@ This generates:
 
 - `dist/sprite.svg` (for CDN/static hosting)
 - `dist/icons.json` (manifest for runtime registration)
+- `dist/iconestia.global.js` (plain script build for non-module HTML)
 
 ## HTML usage
+
+You have two options in plain HTML:
+
+### Option A (modern): module import in browser
 
 ```html
 <script type="module">
@@ -48,8 +53,7 @@ This generates:
   defineIconElement();
 
   // 1) Shared icon set from CDN/static host
-  // inlines sprite symbols when possible (more reliable in HTML pages)
-  await setExternalSprite('/dist/sprite.svg');
+  await setExternalSprite('./dist/sprite.svg');
 
   // 2) Project-specific custom icon (no package rebuild needed)
   registerIcons({
@@ -62,6 +66,20 @@ This generates:
 
 <iconestia-icon name="bolt" size="24px" color="#2563eb"></iconestia-icon>
 <iconestia-icon name="projectBadge" size="28px" stroke="#16a34a"></iconestia-icon>
+```
+
+### Option B (classic): no `import`, global script
+
+Run `npm run build`, then use:
+
+```html
+<script src="./dist/iconestia.global.js"></script>
+<script>
+  Iconestia.defineIconElement();
+  Iconestia.setExternalSprite('./dist/sprite.svg');
+</script>
+
+<iconestia-icon name="bolt" size="24px"></iconestia-icon>
 ```
 
 ## React usage
@@ -176,7 +194,7 @@ If all three happen, HTML usage is working correctly.
 
 - Make sure you are using `http://localhost...` (not opening the HTML file directly with `file://`).
 - Verify the sprite URL is correct in Network tab (`/dist/sprite.svg` should return 200).
-- Prefer `await setExternalSprite('/dist/sprite.svg')` inside `type="module"` scripts.
+- If using module syntax, prefer `await setExternalSprite('./dist/sprite.svg')`.
 - If using a subfolder path, use a relative URL like `./dist/sprite.svg`.
 
 ## Distribution options
