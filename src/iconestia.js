@@ -4,14 +4,6 @@ const DEFAULT_VIEWBOX = '0 0 24 24';
 let externalSpriteUrl = null;
 const customIcons = new Map();
 
-function safeEscape(value) {
-  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
-    return CSS.escape(value);
-  }
-
-  return String(value).replace(/[^a-zA-Z0-9_-]/g, '_');
-}
-
 function ensureSpriteRoot() {
   if (typeof document === 'undefined') return null;
 
@@ -39,30 +31,12 @@ function spriteDefs() {
   return sprite.querySelector('defs');
 }
 
-function getSymbolByName(name) {
-  const defs = spriteDefs();
-  if (!defs) return null;
-  return defs.querySelector(`#${safeEscape(`icon-${name}`)}`);
-}
-
-function normalizeIconEntry(name, icon) {
-  if (!name || !icon || typeof icon !== 'object' || !icon.body) {
-    return null;
-  }
-
-  return {
-    name,
-    body: icon.body,
-    viewBox: icon.viewBox || DEFAULT_VIEWBOX,
-  };
-}
-
 function upsertSymbol({ name, body, viewBox = DEFAULT_VIEWBOX }) {
   const defs = spriteDefs();
   if (!defs || !name || !body) return;
 
   const id = `icon-${name}`;
-  let symbol = defs.querySelector(`#${safeEscape(id)}`);
+  let symbol = defs.querySelector(`#${CSS.escape(id)}`);
 
   if (!symbol) {
     symbol = document.createElementNS('http://www.w3.org/2000/svg', 'symbol');
@@ -74,65 +48,8 @@ function upsertSymbol({ name, body, viewBox = DEFAULT_VIEWBOX }) {
   symbol.innerHTML = body;
 }
 
-function inferViewBox(name) {
-  const localSymbol = getSymbolByName(name);
-  return localSymbol?.getAttribute('viewBox') || customIcons.get(name)?.viewBox || DEFAULT_VIEWBOX;
-}
-
-function rerenderIconElements() {
-  if (typeof document === 'undefined') return;
-
-  document.querySelectorAll('iconestia-icon').forEach((el) => {
-    if (typeof el.render === 'function') {
-      el.render();
-    }
-  });
-}
-
-function importSpriteSymbols(spriteText) {
-  if (typeof DOMParser === 'undefined') return [];
-
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(spriteText, 'image/svg+xml');
-  const symbols = [...doc.querySelectorAll('symbol[id]')];
-
-  const imported = [];
-  for (const symbol of symbols) {
-    const id = symbol.getAttribute('id');
-    if (!id || !id.startsWith('icon-')) continue;
-
-    const name = id.slice(5);
-    const viewBox = symbol.getAttribute('viewBox') || DEFAULT_VIEWBOX;
-    const body = symbol.innerHTML.trim();
-    if (!body) continue;
-
-    upsertSymbol({ name, body, viewBox });
-    imported.push(name);
-  }
-
-  return imported;
-}
-
-export async function setExternalSprite(url, options = {}) {
+export function setExternalSprite(url) {
   externalSpriteUrl = url;
-
-  const inline = options.inline ?? true;
-  if (!inline || typeof fetch === 'undefined') return [];
-
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sprite: ${response.status}`);
-    }
-
-    const spriteText = await response.text();
-    const imported = importSpriteSymbols(spriteText);
-    if (imported.length > 0) rerenderIconElements();
-    return imported;
-  } catch {
-    // Keep external fragment mode as fallback even if inlining fails.
-    return [];
-  }
 }
 
 export function registerIcons(iconSet = {}) {
@@ -140,59 +57,18 @@ export function registerIcons(iconSet = {}) {
     ? iconSet.map((icon) => [icon.name, icon])
     : Object.entries(iconSet).map(([name, icon]) => [name, { name, ...icon }]);
 
-  const registered = [];
-
   for (const [name, icon] of entries) {
-    const normalized = normalizeIconEntry(name, icon);
-    if (!normalized) continue;
-
-    customIcons.set(normalized.name, {
-      body: normalized.body,
-      viewBox: normalized.viewBox,
+    if (!name || !icon?.body) continue;
+    customIcons.set(name, {
+      body: icon.body,
+      viewBox: icon.viewBox || DEFAULT_VIEWBOX,
     });
-    upsertSymbol(normalized);
-    registered.push(normalized.name);
+    upsertSymbol({ name, body: icon.body, viewBox: icon.viewBox });
   }
-
-  rerenderIconElements();
-  return registered;
-}
-
-export function addIconFromSvg(name, svgString) {
-  if (!name || !svgString) return false;
-
-  const viewBoxMatch = svgString.match(/viewBox\s*=\s*"([^"]+)"/i);
-  const bodyMatch = svgString.match(/<svg[^>]*>([\s\S]*?)<\/svg>/i);
-  const body = bodyMatch?.[1]?.trim();
-
-  if (!body) return false;
-
-  registerIcons({
-    [name]: {
-      viewBox: viewBoxMatch?.[1] || DEFAULT_VIEWBOX,
-      body,
-    },
-  });
-
-  return true;
-}
-
-export async function loadIconsFromUrl(url) {
-  if (typeof fetch === 'undefined') {
-    throw new Error('fetch is not available in this environment');
-  }
-
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(`Failed to load icon manifest: ${response.status}`);
-  }
-
-  const manifest = await response.json();
-  return registerIcons(manifest);
 }
 
 function hrefForIcon(name) {
-  if (customIcons.has(name) || getSymbolByName(name) || !externalSpriteUrl) {
+  if (customIcons.has(name) || !externalSpriteUrl) {
     return `#icon-${name}`;
   }
 
@@ -201,7 +77,7 @@ function hrefForIcon(name) {
 
 export class IconestiaIcon extends HTMLElement {
   static get observedAttributes() {
-    return ['name', 'size', 'stroke', 'fill', 'title', 'color', 'viewbox'];
+    return ['name', 'size', 'stroke', 'fill', 'title'];
   }
 
   constructor() {
@@ -225,18 +101,16 @@ export class IconestiaIcon extends HTMLElement {
     }
 
     const size = this.getAttribute('size') || '1em';
-    const color = this.getAttribute('color') || 'currentColor';
-    const stroke = this.getAttribute('stroke') || color;
+    const stroke = this.getAttribute('stroke') || 'currentColor';
     const fill = this.getAttribute('fill') || 'none';
     const title = this.getAttribute('title');
-    const viewBox = this.getAttribute('viewbox') || inferViewBox(name);
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: inline-flex; line-height: 0; color: ${color}; }
+        :host { display: inline-flex; line-height: 0; }
         svg { width: ${size}; height: ${size}; stroke: ${stroke}; fill: ${fill}; }
       </style>
-      <svg viewBox="${viewBox}" aria-hidden="${title ? 'false' : 'true'}" role="img">
+      <svg viewBox="${DEFAULT_VIEWBOX}" aria-hidden="${title ? 'false' : 'true'}" role="img">
         ${title ? `<title>${title}</title>` : ''}
         <use href="${hrefForIcon(name)}"></use>
       </svg>

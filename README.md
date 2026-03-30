@@ -10,18 +10,13 @@ A framework-agnostic icon library starter that works in:
 
 The core idea is simple:
 
-1. Keep shared icons as raw SVG files in `/icons`.
+1. Keep icons as raw SVG files in `/icons`.
 2. Build them into a sprite + JSON manifest.
-3. Let every consumer project add its own custom icons with zero rebuild.
+3. Use one custom element (`<iconestia-icon>`) or register project-specific icons at runtime.
 
-## Why this works for "shared + project custom" icons
+## Why this pattern works everywhere
 
-You can combine **both** strategies at the same time:
-
-- `setExternalSprite('/dist/sprite.svg')` for your shared team/company icon pack.
-- `registerIcons(...)`, `addIconFromSvg(...)`, or `loadIconsFromUrl(...)` for project-local custom icons.
-
-When a project icon name is registered locally, it wins automatically.
+`<iconestia-icon>` is a standard Web Component. Any framework that can render HTML can use it.
 
 ## Quick start
 
@@ -34,117 +29,31 @@ This generates:
 
 - `dist/sprite.svg` (for CDN/static hosting)
 - `dist/icons.json` (manifest for runtime registration)
-- `dist/iconestia.global.js` (plain script build for non-module HTML)
 
 ## HTML usage
 
-You have two options in plain HTML:
-
-### Option A (modern): module import in browser
-
 ```html
 <script type="module">
-  import {
-    defineIconElement,
-    setExternalSprite,
-    registerIcons
-  } from './src/iconestia.js';
+  import { defineIconElement, setExternalSprite } from './src/iconestia.js';
 
   defineIconElement();
-
-  // 1) Shared icon set from CDN/static host
-  await setExternalSprite('./dist/sprite.svg');
-
-  // 2) Project-specific custom icon (no package rebuild needed)
-  registerIcons({
-    projectBadge: {
-      viewBox: '0 0 24 24',
-      body: '<circle cx="12" cy="12" r="9" /><path d="M8 12h8" />'
-    }
-  });
-</script>
-
-<iconestia-icon name="bolt" size="24px" color="#2563eb"></iconestia-icon>
-<iconestia-icon name="projectBadge" size="28px" stroke="#16a34a"></iconestia-icon>
-```
-
-### Option B (classic): no `import`, global script
-
-Run `npm run build`, then use:
-
-```html
-<script src="./dist/iconestia.global.js"></script>
-<script>
-  Iconestia.defineIconElement();
-  Iconestia.setExternalSprite('./dist/sprite.svg');
+  setExternalSprite('/dist/sprite.svg');
 </script>
 
 <iconestia-icon name="bolt" size="24px"></iconestia-icon>
+<iconestia-icon name="leaf" size="32px" stroke="#16a34a"></iconestia-icon>
 ```
-
-## Use in basic HTML5 (no Node, no npm, no bundler)
-
-Yes, you can use Iconestia in pure vanilla HTML.
-
-### Minimum files you need
-
-- `dist/iconestia.global.js` (**required**)
-- `dist/sprite.svg` (optional, only for shared icons hosted as sprite)
-- `dist/icons.json` (optional, only if you want to load a manifest)
-
-### Folder example
-
-```text
-my-site/
-  index.html
-  assets/
-    iconestia.global.js
-    sprite.svg
-```
-
-### Vanilla HTML example (no imports)
-
-```html
-<script src="./assets/iconestia.global.js"></script>
-<script>
-  Iconestia.defineIconElement();
-  Iconestia.setExternalSprite('./assets/sprite.svg');
-</script>
-
-<iconestia-icon name="bolt" size="24px" color="#2563eb"></iconestia-icon>
-```
-
-### CDN style usage
-
-Host these files on any static host/CDN and reference absolute URLs:
-
-```html
-<script src="https://your-cdn.com/iconestia/iconestia.global.js"></script>
-<script>
-  Iconestia.defineIconElement();
-  Iconestia.setExternalSprite('https://your-cdn.com/iconestia/sprite.svg');
-</script>
-```
-
-See `examples/vanilla-no-node.html` for a complete no-node example.
 
 ## React usage
 
 ```jsx
 import { useEffect } from 'react';
-import {
-  defineIconElement,
-  setExternalSprite,
-  loadIconsFromUrl
-} from 'iconestia';
+import { defineIconElement, setExternalSprite } from 'iconestia';
 
 export function App() {
   useEffect(() => {
     defineIconElement();
-    setExternalSprite('/icons/sprite.svg'); // async, can be awaited
-
-    // optional: load project-specific icons from JSON
-    loadIconsFromUrl('/project-icons/icons.json');
+    setExternalSprite('/icons/sprite.svg');
   }, []);
 
   return <iconestia-icon name="bolt" size="20px" />;
@@ -156,7 +65,6 @@ export function App() {
 1. Call `defineIconElement()` once in `main.ts`.
 2. Add `CUSTOM_ELEMENTS_SCHEMA` in your module/component schema.
 3. Use `<iconestia-icon name="leaf"></iconestia-icon>` in templates.
-4. Register project-specific icons in a service or app initializer.
 
 ## .NET Blazor usage
 
@@ -166,14 +74,16 @@ Use the element directly in `.razor`:
 <iconestia-icon name="bolt" size="24px"></iconestia-icon>
 ```
 
-Then load your module in `index.html` / `_Layout.cshtml`, call `defineIconElement()`, and optionally load project icon JSON.
+Then load your module in `index.html` / `_Layout.cshtml` and call `defineIconElement()`.
 
-## Project-specific custom icons (the key workflow)
+## Project-specific custom icons (the "twist")
 
-### Option A: Register inline icon data
+If each project needs extra custom icons, register them at runtime:
 
 ```js
-import { registerIcons } from 'iconestia';
+import { defineIconElement, registerIcons } from 'iconestia';
+
+defineIconElement();
 
 registerIcons({
   companyLogo: {
@@ -183,65 +93,11 @@ registerIcons({
 });
 ```
 
-### Option B: Add from a full SVG string
-
-```js
-import { addIconFromSvg } from 'iconestia';
-
-addIconFromSvg('customRocket', `
-  <svg viewBox="0 0 24 24">
-    <path d="M5 19c4-1 7-4 8-8l6-6-1-1-6 6c-4 1-7 4-8 8h1z"/>
-  </svg>
-`);
-```
-
-### Option C: Load a project JSON manifest
-
-```js
-import { loadIconsFromUrl } from 'iconestia';
-
-await loadIconsFromUrl('/project-icons/icons.json');
-```
-
-Then use all icons with the same element (including size/color customization):
+Now use it the same way:
 
 ```html
-<iconestia-icon name="companyLogo" size="20px" color="#7c3aed"></iconestia-icon>
-<iconestia-icon name="customRocket" size="32px" stroke="#dc2626" fill="none"></iconestia-icon>
+<iconestia-icon name="companyLogo"></iconestia-icon>
 ```
-
-## How to verify it works in plain HTML
-
-1. Build icons:
-
-```bash
-npm run build
-```
-
-2. Start a static server from repo root:
-
-```bash
-python3 -m http.server 8080
-```
-
-3. Open this URL in your browser:
-
-- `http://localhost:8080/examples/smoke-test.html`
-
-4. Expected result:
-
-- You should see three icons in one row.
-- They should have different size/color styling.
-- `projectBadge` should render even though it is only registered at runtime in that page.
-
-If all three happen, HTML usage is working correctly.
-
-## HTML troubleshooting (if icons don't show)
-
-- Make sure you are using `http://localhost...` (not opening the HTML file directly with `file://`).
-- Verify the sprite URL is correct in Network tab (`/dist/sprite.svg` should return 200).
-- If using module syntax, prefer `await setExternalSprite('./dist/sprite.svg')`.
-- If using a subfolder path, use a relative URL like `./dist/sprite.svg`.
 
 ## Distribution options
 
@@ -249,7 +105,7 @@ If all three happen, HTML usage is working correctly.
 - **CDN**: publish `dist/sprite.svg` and ESM entry file (`src/iconestia.js`) to a static host.
 - **File download**: zip `dist/` and share with teams.
 
-## Add new shared icons
+## Add new icons
 
 1. Drop SVG files into `/icons` (e.g., `camera.svg`).
 2. Run `npm run build`.
@@ -258,17 +114,6 @@ If all three happen, HTML usage is working correctly.
 ## API
 
 - `defineIconElement(tagName = 'iconestia-icon')`
-- `setExternalSprite(url, options?) => Promise<string[]>`
-- `registerIcons(iconMap | iconArray) => string[]`
-- `addIconFromSvg(name, svgString) => boolean`
-- `loadIconsFromUrl(url) => Promise<string[]>`
-
-`<iconestia-icon>` attributes:
-- `name` (required)
-- `size` (e.g. `20px`, `1.5rem`)
-- `color` (applies as default icon color)
-- `stroke` (overrides stroke color)
-- `fill`
-- `title`
-- `viewbox` (optional override when needed)
+- `setExternalSprite(url)`
+- `registerIcons(iconMap | iconArray)`
 
