@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Iconestia HTML Smoke Test</title>
+    <style>
+      body { font-family: system-ui, sans-serif; padding: 24px; }
+      .row { display: flex; gap: 16px; align-items: center; margin-top: 12px; }
+      iconestia-icon { border: 1px dashed #ddd; padding: 6px; border-radius: 8px; }
+    </style>
+  </head>
+  <body>
+    <h1>Iconestia HTML Smoke Test</h1>
+    <p>If all icons show and styles differ, your setup works.</p>
+
+    <div class="row">
+      <iconestia-icon name="bolt" size="24px" color="#2563eb"></iconestia-icon>
+      <iconestia-icon name="leaf" size="28px" stroke="#16a34a"></iconestia-icon>
+      <iconestia-icon name="projectBadge" size="30px" stroke="#dc2626"></iconestia-icon>
+    </div>
+
+    <script type="module">
+      import { defineIconElement, setExternalSprite, registerIcons } from '../src/iconestia.js';
+
+      defineIconElement();
+      setExternalSprite('../dist/sprite.svg');
+
+      // Custom project-local icon (no rebuild needed)
+      registerIcons({
+        projectBadge: {
+          viewBox: '0 0 24 24',
+          body: '<circle cx="12" cy="12" r="8" /><path d="M8 12h8" />'
+        }
+      });
+    </script>
+  </body>
+</html>

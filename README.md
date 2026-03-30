@@ -145,6 +145,32 @@ Then use all icons with the same element (including size/color customization):
 <iconestia-icon name="customRocket" size="32px" stroke="#dc2626" fill="none"></iconestia-icon>
 ```
 
+## How to verify it works in plain HTML
+
+1. Build icons:
+
+```bash
+npm run build
+```
+
+2. Start a static server from repo root:
+
+```bash
+python3 -m http.server 8080
+```
+
+3. Open this URL in your browser:
+
+- `http://localhost:8080/examples/smoke-test.html`
+
+4. Expected result:
+
+- You should see three icons in one row.
+- They should have different size/color styling.
+- `projectBadge` should render even though it is only registered at runtime in that page.
+
+If all three happen, HTML usage is working correctly.
+
 ## Distribution options
 
 - **npm package**: publish this repo as-is.
