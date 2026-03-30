@@ -274,8 +274,8 @@ export class IconestiaIcon extends HTMLElement {
 
     const size = this.getAttribute('size') || '1em';
     const color = this.getAttribute('color') || 'currentColor';
-    const stroke = this.getAttribute('stroke') || color;
-    const fill = this.getAttribute('fill') || 'none';
+    const stroke = this.getAttribute('stroke');
+    const fill = this.getAttribute('fill');
     const title = this.getAttribute('title');
     const viewBox = this.getAttribute('viewbox') || inferViewBox(name);
     const iconBody = getIconBody(name);
@@ -283,11 +283,13 @@ export class IconestiaIcon extends HTMLElement {
     const iconMarkup = iconBody
       ? iconBody
       : `<use href="${externalHref}" xlink:href="${externalHref}"></use>`;
+    const strokeRule = stroke !== null ? `stroke: ${stroke};` : '';
+    const fillRule = fill !== null ? `fill: ${fill};` : '';
 
     this.shadowRoot.innerHTML = `
       <style>
         :host { display: inline-flex; line-height: 0; color: ${color}; }
-        svg { width: ${size}; height: ${size}; stroke: ${stroke}; fill: ${fill}; }
+        svg { width: ${size}; height: ${size}; ${strokeRule} ${fillRule} }
       </style>
       <svg viewBox="${viewBox}" aria-hidden="${title ? 'false' : 'true'}" role="img">
         ${title ? `<title>${title}</title>` : ''}
