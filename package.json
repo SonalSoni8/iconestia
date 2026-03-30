@@ -1,6 +1,6 @@
 {
   "name": "iconestia",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Framework-agnostic custom icon library with sprite builder and web component",
   "type": "module",
   "main": "src/iconestia.js",
