@@ -3,37 +3,77 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Iconestia Vanilla (No Node)</title>
+    <title>Thinicons CDN Example</title>
     <style>
-      body { font-family: Arial, sans-serif; padding: 20px; }
-      .icons { display: flex; gap: 12px; align-items: center; }
+      :root {
+        --bg: #f4f8ff;
+        --fg: #0d1b2f;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: 'Segoe UI', sans-serif;
+        background: radial-gradient(circle at 20% 0, #d7ebff, transparent 40%), var(--bg);
+        color: var(--fg);
+        display: grid;
+        place-items: center;
+      }
+
+      .card {
+        width: min(760px, 92vw);
+        border-radius: 18px;
+        border: 1px solid #d7e4fb;
+        background: rgba(255, 255, 255, 0.82);
+        padding: 1.2rem;
+        box-shadow: 0 18px 44px rgba(15, 33, 57, 0.14);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 12px;
+        margin-top: 1rem;
+      }
+
+      .tile {
+        border: 1px solid #d6e1f5;
+        border-radius: 12px;
+        background: #fff;
+        padding: 0.75rem;
+        text-align: center;
+        font-size: 0.85rem;
+      }
+
+      .tile svg {
+        width: 24px;
+        height: 24px;
+        stroke: currentColor;
+      }
     </style>
   </head>
   <body>
-    <h2>Vanilla HTML5 (No Node, No Bundler)</h2>
-    <p>Uses only downloaded files from <code>dist/</code>.</p>
+    <section class="card">
+      <h1>Thinicons CDN Example</h1>
+      <p>Loads optimized SVG icons directly from jsDelivr.</p>
+      <div class="row" id="icons"></div>
+    </section>
 
-    <div class="icons">
-      <iconestia-icon name="bolt" size="22px" color="#1d4ed8"></iconestia-icon>
-      <iconestia-icon name="leaf" size="28px" stroke="#16a34a"></iconestia-icon>
-      <iconestia-icon name="myLocal" size="26px" stroke="#dc2626"></iconestia-icon>
-    </div>
-
-    <!-- Only required JS file -->
-    <script src="../dist/iconestia.global.js"></script>
     <script>
-      Iconestia.defineIconElement();
+      const iconNames = ['home', 'search', 'wallet', 'settings', 'bell', 'user'];
+      const base = 'https://cdn.jsdelivr.net/npm/@thinicons/core@latest/icons/optimized';
+      const root = document.querySelector('#icons');
 
-      // Optional shared sprite file
-      Iconestia.setExternalSprite('../dist/sprite.svg');
-
-      // Project-local runtime icon (no build step required)
-      Iconestia.registerIcons({
-        myLocal: {
-          viewBox: '0 0 24 24',
-          body: '<path d="M4 12h16M12 4v16" />'
-        }
-      });
+      Promise.all(iconNames.map((name) => fetch(`${base}/${name}.svg`).then((res) => res.text()))).then(
+        (svgs) => {
+          svgs.forEach((svg, index) => {
+            const tile = document.createElement('div');
+            tile.className = 'tile';
+            tile.innerHTML = `${svg}<div style="margin-top:8px">${iconNames[index]}</div>`;
+            root.appendChild(tile);
+          });
+        },
+      );
     </script>
   </body>
 </html>

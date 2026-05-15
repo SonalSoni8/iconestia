@@ -1,0 +1,36 @@
+{
+  "name": "@thinicons/cli",
+  "version": "0.1.0",
+  "description": "CLI tooling for Thinicons icon generation workflows.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "thinicons": "./dist/index.js"
+  },
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint \"src/**/*.ts\"",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.3.5"
+  }
+}

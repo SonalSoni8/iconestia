@@ -1,0 +1,10 @@
+node_modules
+.pnpm-store
+.turbo
+.next
+.next-docs
+dist
+coverage
+.DS_Store
+package-lock.json
+*.tsbuildinfo

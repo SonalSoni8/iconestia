@@ -1,0 +1,47 @@
+{
+  "name": "@thinicons/core",
+  "version": "0.1.0",
+  "description": "Core SVG source, metadata, and optimized assets for Thinicons.",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "metadata",
+    "generated",
+    "icons/raw",
+    "icons/optimized"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./generated/icons.json": "./generated/icons.json",
+    "./generated/icon-manifest.json": "./generated/icon-manifest.json",
+    "./metadata/icons": {
+      "types": "./dist/metadata/icons.d.ts",
+      "import": "./dist/metadata/icons.js"
+    },
+    "./icons/raw/*": "./icons/raw/*",
+    "./icons/optimized/*": "./icons/optimized/*"
+  },
+  "scripts": {
+    "generate": "tsx scripts/optimize-icons.ts",
+    "build": "pnpm run generate && tsup",
+    "lint": "eslint \"src/**/*.ts\" \"scripts/**/*.ts\"",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "clean": "rimraf dist generated/icons.ts generated/icons.json generated/icon-manifest.json icons/optimized"
+  },
+  "devDependencies": {
+    "svgo": "^3.3.2",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "name": "@thinicons/react",
+  "version": "0.1.0",
+  "description": "React components for the Thinicons icon set.",
+  "type": "module",
+  "license": "MIT",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./icon-base": {
+      "types": "./dist/icon-base.d.ts",
+      "import": "./dist/icon-base.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "import": "./dist/types.js"
+    },
+    "./icons/*": {
+      "types": "./dist/icons/*.d.ts",
+      "import": "./dist/icons/*.js"
+    }
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "scripts": {
+    "generate": "tsx scripts/generate-icons.ts",
+    "build": "pnpm --filter @thinicons/core generate && pnpm run generate && tsup",
+    "lint": "eslint \"src/**/*.{ts,tsx}\" \"scripts/**/*.ts\"",
+    "typecheck": "tsc --project tsconfig.json --noEmit",
+    "clean": "rimraf dist"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "@svgr/core": "^8.1.0",
+    "@svgr/plugin-jsx": "^8.1.0",
+    "@svgr/plugin-svgo": "^8.1.0",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2"
+  }
+}

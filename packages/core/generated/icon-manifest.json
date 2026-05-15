@@ -1,0 +1,189 @@
+{
+  "packageName": "@thinicons/core",
+  "generatedAt": "2026-05-14T20:16:43.613Z",
+  "total": 10,
+  "categories": {
+    "arrows": 1,
+    "communication": 1,
+    "actions": 1,
+    "analytics": 1,
+    "navigation": 2,
+    "ui": 2,
+    "users": 1,
+    "finance": 1
+  },
+  "icons": [
+    {
+      "name": "arrow-right",
+      "componentName": "ArrowRightIcon",
+      "title": "Arrow Right",
+      "category": "arrows",
+      "tags": [
+        "next",
+        "forward",
+        "direction"
+      ],
+      "terms": [
+        "continue"
+      ],
+      "rawPath": "icons/raw/arrow-right.svg",
+      "optimizedPath": "icons/optimized/arrow-right.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><path d=\"M5 12h14m-6-6 6 6-6 6\"/></svg>"
+    },
+    {
+      "name": "bell",
+      "componentName": "BellIcon",
+      "title": "Bell",
+      "category": "communication",
+      "tags": [
+        "notification",
+        "alert",
+        "reminder"
+      ],
+      "terms": [
+        "announce"
+      ],
+      "rawPath": "icons/raw/bell.svg",
+      "optimizedPath": "icons/optimized/bell.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><path d=\"M18 8A6 6 0 1 0 6 8c0 6-2.5 7.5-2.5 7.5h17S18 14 18 8m-8 10h4m-3 3h2\"/></svg>"
+    },
+    {
+      "name": "close",
+      "componentName": "CloseIcon",
+      "title": "Close",
+      "category": "actions",
+      "tags": [
+        "dismiss",
+        "cancel",
+        "x"
+      ],
+      "terms": [
+        "remove"
+      ],
+      "rawPath": "icons/raw/close.svg",
+      "optimizedPath": "icons/optimized/close.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><path d=\"m6 6 12 12m0-12L6 18\"/></svg>"
+    },
+    {
+      "name": "dashboard",
+      "componentName": "DashboardIcon",
+      "title": "Dashboard",
+      "category": "analytics",
+      "tags": [
+        "grid",
+        "overview",
+        "metrics"
+      ],
+      "terms": [
+        "panel"
+      ],
+      "rawPath": "icons/raw/dashboard.svg",
+      "optimizedPath": "icons/optimized/dashboard.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><rect width=\"7\" height=\"7\" x=\"4\" y=\"4\" rx=\"1.75\"/><rect width=\"7\" height=\"5\" x=\"13\" y=\"4\" rx=\"1.75\"/><rect width=\"7\" height=\"9\" x=\"13\" y=\"11\" rx=\"1.75\"/><rect width=\"7\" height=\"7\" x=\"4\" y=\"13\" rx=\"1.75\"/></svg>"
+    },
+    {
+      "name": "home",
+      "componentName": "HomeIcon",
+      "title": "Home",
+      "category": "navigation",
+      "tags": [
+        "house",
+        "dashboard",
+        "main"
+      ],
+      "terms": [
+        "landing",
+        "start"
+      ],
+      "rawPath": "icons/raw/home.svg",
+      "optimizedPath": "icons/optimized/home.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><path d=\"M3 10.5 12 3l9 7.5\"/><path d=\"M5.25 9.75V21h13.5V9.75\"/></svg>"
+    },
+    {
+      "name": "menu",
+      "componentName": "MenuIcon",
+      "title": "Menu",
+      "category": "navigation",
+      "tags": [
+        "hamburger",
+        "list",
+        "toggle"
+      ],
+      "terms": [
+        "nav"
+      ],
+      "rawPath": "icons/raw/menu.svg",
+      "optimizedPath": "icons/optimized/menu.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><path d=\"M4 7h16M4 12h16M4 17h16\"/></svg>"
+    },
+    {
+      "name": "search",
+      "componentName": "SearchIcon",
+      "title": "Search",
+      "category": "ui",
+      "tags": [
+        "find",
+        "query",
+        "magnify"
+      ],
+      "terms": [
+        "lookup"
+      ],
+      "rawPath": "icons/raw/search.svg",
+      "optimizedPath": "icons/optimized/search.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><circle cx=\"11\" cy=\"11\" r=\"6\"/><path d=\"m20 20-4.2-4.2\"/></svg>"
+    },
+    {
+      "name": "settings",
+      "componentName": "SettingsIcon",
+      "title": "Settings",
+      "category": "ui",
+      "tags": [
+        "preferences",
+        "controls",
+        "gear"
+      ],
+      "terms": [
+        "configuration"
+      ],
+      "rawPath": "icons/raw/settings.svg",
+      "optimizedPath": "icons/optimized/settings.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M19.4 15a8 8 0 0 0 .05-.9 8 8 0 0 0-.05-.9l2-1.55-2-3.46-2.4.9a7.8 7.8 0 0 0-1.56-.9L14.95 4h-4l-.49 2.19a7.8 7.8 0 0 0-1.56.9l-2.4-.9-2 3.46 2 1.55a8 8 0 0 0-.05.9 8 8 0 0 0 .05.9l-2 1.55 2 3.46 2.4-.9a7.8 7.8 0 0 0 1.56.9l.49 2.19h4l.49-2.19a7.8 7.8 0 0 0 1.56-.9l2.4.9 2-3.46-2-1.55Z\"/></svg>"
+    },
+    {
+      "name": "user",
+      "componentName": "UserIcon",
+      "title": "User",
+      "category": "users",
+      "tags": [
+        "profile",
+        "account",
+        "person"
+      ],
+      "terms": [
+        "member",
+        "identity"
+      ],
+      "rawPath": "icons/raw/user.svg",
+      "optimizedPath": "icons/optimized/user.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 20q2.4-5 8-5c5.6 0 6.4 1.667 8 5\"/></svg>"
+    },
+    {
+      "name": "wallet",
+      "componentName": "WalletIcon",
+      "title": "Wallet",
+      "category": "finance",
+      "tags": [
+        "money",
+        "payment",
+        "billing"
+      ],
+      "terms": [
+        "funds"
+      ],
+      "rawPath": "icons/raw/wallet.svg",
+      "optimizedPath": "icons/optimized/wallet.svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" fill=\"none\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.75\" viewBox=\"0 0 24 24\"><rect width=\"18\" height=\"12\" x=\"3\" y=\"6\" rx=\"2.5\"/><path d=\"M15.5 12h3\"/></svg>"
+    }
+  ]
+}

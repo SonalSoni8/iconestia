@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/eslintrc",
+  "root": true,
+  "ignorePatterns": ["**/dist/**", "**/.next/**", "**/node_modules/**"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "import"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:import/recommended",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "settings": {
+    "import/resolver": {
+      "typescript": true
+    }
+  },
+  "rules": {
+    "import/no-default-export": "off",
+    "@typescript-eslint/consistent-type-imports": [
+      "error",
+      {
+        "prefer": "type-imports"
+      }
+    ]
+  }
+}

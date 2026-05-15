@@ -1,122 +1,321 @@
-# Iconestia
+# THINICONS
 
-A framework-agnostic icon library starter that works in:
+Developer-first icon ecosystem built for speed, consistency, and customization.
 
-- plain HTML
-- React
-- Angular
-- Vue/Svelte
-- .NET Blazor/Razor pages
+Thinicons is focused on one job: delivering consistent, customizable SVG icons for frontend teams.
 
-The core idea is simple:
+## What Thinicons Is
 
-1. Keep icons as raw SVG files in `/icons`.
-2. Build them into a sprite + JSON manifest.
-3. Use one custom element (`<iconestia-icon>`) or register project-specific icons at runtime.
+- Open-source icon library ecosystem
+- React + TypeScript friendly
+- Tree-shakeable package exports
+- SVG-first pipeline with optimization and metadata
+- Docs/playground for search, copy, and preview workflows
 
-## Why this pattern works everywhere
+## What Thinicons Is Not
 
-`<iconestia-icon>` is a standard Web Component. Any framework that can render HTML can use it.
+- Not an AI icon generator
+- Not a SaaS product
+- Not a design QA/automation platform
+- No auth, database, or backend complexity
 
-## Quick start
+## Tech Stack
 
-```bash
-npm install
-npm run build
+- Turborepo
+- pnpm workspaces
+- TypeScript (strict mode)
+- React 19
+- Next.js App Router
+- Tailwind CSS
+- SVGO + SVGR
+- tsup
+- Changesets
+- ESLint + Prettier
+- Husky + lint-staged
+
+## Monorepo Structure
+
+```text
+thinicons/
+├─ apps/
+│  └─ docs/                  # Next.js docs + icon explorer
+├─ packages/
+│  ├─ core/                  # Raw SVGs, metadata, optimization pipeline
+│  ├─ react/                 # Typed React icon components
+│  └─ cli/                   # thinicons CLI
+├─ examples/
+│  └─ vanilla-no-node.html   # Simple HTML/CDN example
+├─ turbo.json
+├─ pnpm-workspace.yaml
+└─ package.json
 ```
 
-This generates:
+## Packages
 
-- `dist/sprite.svg` (for CDN/static hosting)
-- `dist/icons.json` (manifest for runtime registration)
-- `dist/iconestia.global.js` (browser global build for vanilla HTML)
+### `@thinicons/core`
 
-## HTML usage
+- Source of truth for icons (`icons/raw`)
+- Optimized output (`icons/optimized`)
+- Metadata registry (`metadata/icons.ts`)
+- Generated artifacts:
+  - `generated/icons.json`
+  - `generated/icon-manifest.json`
+  - `generated/icons.ts`
 
-```html
-<script type="module">
-  import { setupIconestia } from './src/iconestia.js';
+### `@thinicons/react`
 
-  setupIconestia('/dist/sprite.svg');
-</script>
+- Generated React components with `forwardRef`
+- Tree-shakeable named exports
+- Shared `IconBase` for consistent behavior
 
-<iconestia-icon name="bolt" size="24px"></iconestia-icon>
-<iconestia-icon name="leaf" size="32px" stroke="#16a34a"></iconestia-icon>
-```
+Supported props:
 
-## React usage
+- `size`
+- `width`
+- `height`
+- `color`
+- `strokeWidth`
+- `className`
+- `variant` (`outline | solid | soft | duotone`)
 
-```jsx
-import { useEffect } from 'react';
-import { defineIconElement, setExternalSprite } from 'iconestia';
+Example:
 
-export function App() {
-  useEffect(() => {
-    defineIconElement();
-    setExternalSprite('/icons/sprite.svg');
-  }, []);
+```tsx
+import { HomeIcon } from '@thinicons/react';
 
-  return <iconestia-icon name="bolt" size="20px" />;
+export function Example() {
+  return <HomeIcon size={24} strokeWidth={1.75} variant="outline" className="text-black" />;
 }
 ```
 
-## Angular usage
+### `@thinicons/cli`
 
-1. Call `defineIconElement()` once in `main.ts`.
-2. Add `CUSTOM_ELEMENTS_SCHEMA` in your module/component schema.
-3. Use `<iconestia-icon name="leaf"></iconestia-icon>` in templates.
+Commands:
 
-## .NET Blazor usage
+- `thinicons generate [iconName]`
+- `thinicons optimize`
+- `thinicons build`
+- `thinicons export <iconName> --format svg|jsx|json --out ./dir`
+- `thinicons list`
 
-Use the element directly in `.razor`:
+## Icon Design Contract
 
-```razor
-<iconestia-icon name="bolt" size="24px"></iconestia-icon>
+All icons follow:
+
+- Grid: `24x24`
+- Default stroke width: `1.75`
+- `strokeLinecap="round"`
+- `strokeLinejoin="round"`
+- Clean geometry and consistent padding
+
+## CDN Usage
+
+Raw optimized SVG example:
+
+```txt
+https://cdn.jsdelivr.net/npm/@thinicons/core@latest/icons/optimized/home.svg
+https://unpkg.com/@thinicons/core@latest/icons/optimized/home.svg
 ```
 
-Then load your module in `index.html` / `_Layout.cshtml` and call `defineIconElement()`.
+React ESM example endpoint:
 
-## Project-specific custom icons (the "twist")
-
-If each project needs extra custom icons, register them at runtime:
-
-```js
-import { defineIconElement, registerIcons } from 'iconestia';
-
-defineIconElement();
-
-registerIcons({
-  companyLogo: {
-    viewBox: '0 0 24 24',
-    body: '<path d="M3 12h18M12 3v18" />'
-  }
-});
+```txt
+https://esm.sh/@thinicons/react@latest
 ```
 
-Now use it the same way:
+## Local Development
 
-```html
-<iconestia-icon name="companyLogo"></iconestia-icon>
+### Prerequisites
+
+- Node.js 18+ (Node 20+ recommended)
+
+### Install dependencies
+
+If you already have `pnpm`:
+
+```bash
+pnpm install
 ```
 
-## Distribution options
+If `pnpm` is not installed globally:
 
-- **npm package**: publish this repo as-is.
-- **CDN**: publish `dist/sprite.svg` and ESM entry file (`src/iconestia.js`) to a static host.
-- **File download**: zip `dist/` and share with teams.
+```bash
+npm exec --yes pnpm@9.12.3 -- install
+```
 
-## Add new icons
+### Run all apps/packages in dev mode
 
-1. Drop SVG files into `/icons` (e.g., `camera.svg`).
-2. Run `npm run build`.
-3. Use `name="camera"` anywhere.
+With pnpm:
 
-## API
+```bash
+pnpm dev
+```
 
-- `defineIconElement(tagName = 'iconestia-icon')`
-- `setupIconestia(spriteUrl, options?)`
-- `setExternalSprite(url, options?)`
-- `registerIcons(iconMap | iconArray)`
-- `loadIconsFromUrl(url)`
-- `addIconFromSvg(name, svgString)`
+Without global pnpm:
 
+```bash
+npm exec --yes pnpm@9.12.3 -- dev
+```
+
+### Run docs app only
+
+With pnpm:
+
+```bash
+pnpm --filter @thinicons/docs dev -- --hostname 0.0.0.0 --port 4000
+```
+
+Without global pnpm:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- --filter @thinicons/docs dev -- --hostname 0.0.0.0 --port 4000
+```
+
+### Generate icons/components
+
+With pnpm:
+
+```bash
+pnpm generate
+```
+
+Without global pnpm:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- generate
+```
+
+### Quality checks
+
+With pnpm:
+
+```bash
+pnpm lint
+pnpm typecheck
+pnpm format
+```
+
+Without global pnpm:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- lint
+npm exec --yes pnpm@9.12.3 -- typecheck
+npm exec --yes pnpm@9.12.3 -- format
+```
+
+### Build everything
+
+With pnpm:
+
+```bash
+pnpm build
+```
+
+Without global pnpm:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- build
+```
+
+## HTML Example
+
+Use the included file:
+
+- `examples/vanilla-no-node.html`
+
+Open it directly in a browser, or serve it from a static server.
+
+## Adding a New Icon
+
+1. Add SVG to `packages/core/icons/raw`.
+2. Add metadata in `packages/core/metadata/icons.ts`.
+3. Run generation:
+   - `pnpm --filter @thinicons/core generate`
+   - `pnpm --filter @thinicons/react generate`
+4. Validate in docs explorer (`/icons`).
+5. Run `lint`, `typecheck`, and `build`.
+
+## Publishing
+
+This repo uses Changesets.
+
+```bash
+pnpm changeset
+pnpm release
+```
+
+Published packages:
+
+- `@thinicons/core`
+- `@thinicons/react`
+- `@thinicons/cli`
+
+Package readiness:
+
+- `sideEffects: false`
+- ESM outputs
+- Typed exports
+- Tree-shakeable entry points
+
+## Troubleshooting
+
+### `pnpm` is not recognized
+
+Use:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- <command>
+```
+
+Example:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- build
+```
+
+### Module not found: `@thinicons/core` in docs
+
+Build/generate workspace packages first:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- --filter @thinicons/core build
+npm exec --yes pnpm@9.12.3 -- --filter @thinicons/react build
+```
+
+Then run docs again.
+
+### Hydration warning caused by browser extensions
+
+Some Chrome extensions inject attributes before React hydration. The docs app root layout is configured with hydration warning suppression for this case.
+
+### Port already in use
+
+Run docs on another port:
+
+```bash
+npm exec --yes pnpm@9.12.3 -- --filter @thinicons/docs dev -- --port 4010
+```
+
+## Roadmap
+
+### V1
+
+- Monorepo foundation
+- Core/React/CLI packages
+- Docs playground
+- npm release pipeline
+
+### V2
+
+- Expand icon set
+- Improve CLI export workflows
+- Add richer icon variants
+
+### V3
+
+- Optional AI-assisted authoring workflows
+- AI supports the ecosystem, never replaces the core product
+
+## License
+
+MIT

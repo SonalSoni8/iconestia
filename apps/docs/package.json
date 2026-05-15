@@ -1,0 +1,31 @@
+{
+  "name": "@thinicons/docs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "pnpm --filter @thinicons/core build && pnpm --filter @thinicons/react build",
+    "dev": "next dev",
+    "prebuild": "pnpm --filter @thinicons/core build && pnpm --filter @thinicons/react build",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf .next .next-docs"
+  },
+  "dependencies": {
+    "@thinicons/core": "workspace:*",
+    "@thinicons/react": "workspace:*",
+    "next": "^15.3.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.4.20",
+    "eslint-config-next": "^15.3.3",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.15"
+  }
+}
